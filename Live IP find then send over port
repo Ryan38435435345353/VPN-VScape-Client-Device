@@ -1,0 +1,54 @@
+from random import randint
+from requests import get
+import time
+import socket
+  #https://www.techwithtim.net/tutorials/socket-programming/
+  #time.sleep(10)
+
+SERVER = "192.168.1.26"
+PORT = 5050
+
+
+HEADER = 64
+FORMAT = 'utf-8'
+DISCONNECT_MESSAGE = "!DISCONNECT"
+ADDR = (SERVER, PORT)
+
+
+x = 0
+OG = get('https://api.ipify.org').content.decode('utf8')
+IP = ('{}'.format(OG))
+
+while(0 == 0):
+  IP = ('{}'.format(OG))
+  Y = get('https://api.ipify.org').content.decode('utf8')
+  ip = ('{}'.format(Y))
+
+
+  if(ip == IP):
+    print("Same")
+    time.sleep(10)
+
+  else:
+    print("New: " + ip)
+    print(ip)
+    
+    time.sleep(1)
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client.connect(ADDR)
+
+    def send(msg):
+        message = msg.encode(FORMAT)
+        msg_length = len(message)
+        send_length = str(msg_length).encode(FORMAT)
+        send_length += b' ' * (HEADER - len(send_length))
+        client.send(send_length)
+        client.send(message)
+        print(client.recv(2048).decode(FORMAT))
+    send("Old:")
+    send(IP)
+    send("New:")
+    send(ip)
+
+    send(DISCONNECT_MESSAGE)
+    OG = get('https://api.ipify.org').content.decode('utf8')
