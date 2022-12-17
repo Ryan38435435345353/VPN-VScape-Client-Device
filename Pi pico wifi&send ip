@@ -1,0 +1,44 @@
+import network   # handles connecting to WiFi
+import urequests # handles making and servicing network requests
+from machine import Pin
+import socket
+import time
+import requests
+
+# Connect to network
+wlan = network.WLAN(network.STA_IF)
+wlan.active(True)
+
+# Fill in your network name (ssid) and password here:
+ssid = '2.4GHZ_bdi.net'
+password = '5197458031'
+wlan.connect(ssid, password)
+
+
+HEADER = 64
+PORT = 5050 # Port
+FORMAT = 'utf-8'
+DISCONNECT_MESSAGE = "!DISCONNECT"
+SERVER = "Vscape.webredirect.org" # Server
+ADDR = (SERVER, PORT)
+
+response = requests.get('https://checkip.amazonaws.com/')
+IP = (response.text)
+
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client.connect(ADDR)
+
+def send(msg):
+    message = msg.encode(FORMAT)
+    msg_length = len(message)
+    send_length = str(msg_length).encode(FORMAT)
+    send_length += b' ' * (HEADER - len(send_length))
+    client.send(send_length)
+    client.send(message)
+    print(client.recv(2048).decode(FORMAT))
+
+send(IP)
+led = Pin(25, Pin.OUT)
+
+led.toggle()
+
